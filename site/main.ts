@@ -235,7 +235,7 @@ function renderLanding(): string {
             <h1 id="hero-title">The date toolkit you actually ship</h1>
             <p>
               39 fully typed date utilities for TypeScript teams. Format, parse, compare,
-              add, subtract, and snap date ranges in about 2.19KB minzipped.
+              add, subtract, and snap date ranges in about 2.18KB minzipped.
             </p>
             <div class="hero-actions">
               <a class="primary-button" href="${appPath("/docs")}" data-link>Get Started</a>

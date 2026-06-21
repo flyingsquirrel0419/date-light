@@ -13,7 +13,7 @@
 
 **The date helpers you actually ship. Nothing else.**
 
-39 fully typed date utilities in **~2.19 KB minzipped**. Zero dependencies. Immutable by default.
+39 fully typed date utilities in **~2.18 KB minzipped**. Zero dependencies. Immutable by default.
 
 [Install](#install) · [Why date-light?](#why-date-light) · [Docs](docs/README.md) · [API](docs/api.md)
 
@@ -27,7 +27,7 @@ Most apps only need a small, predictable slice of date-fns: format a date, parse
 
 date-light keeps that slice tiny:
 
-- **2.19 KB minzipped** for 39 common utilities
+- **2.18 KB minzipped** for 39 common utilities
 - **Zero runtime dependencies**
 - **TypeScript-first** with generated declarations
 - **Immutable functions** that never mutate input dates
@@ -96,7 +96,7 @@ That is the point. For those jobs, use `Intl`, Temporal, Luxon, or date-fns dire
 
 | Library                 | minzipped   | Note                               |
 | ----------------------- | ----------- | ---------------------------------- |
-| **date-light**          | **2.19 KB** | 39 functions, fully tree-shakeable |
+| **date-light**          | **2.18 KB** | 39 functions, fully tree-shakeable |
 | dayjs                   | 2.97 KB     | Core only                          |
 | date-fns (20 functions) | 18.34 KB    | Same common-operation comparison   |
 | date-fns (full)         | 261.3 KB    | Full package                       |

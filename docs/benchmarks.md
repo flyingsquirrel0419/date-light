@@ -35,12 +35,12 @@ Benchmarks are run with Vitest on Node.js 24. Values are nanoseconds per operati
 
 | Library                 | minzipped | Note                             |
 | ----------------------- | --------- | -------------------------------- |
-| date-light              | 2.19 KB   | 39 functions                     |
+| date-light              | 2.18 KB   | 39 functions                     |
 | dayjs                   | 2.97 KB   | Core only                        |
 | date-fns (20 functions) | 18.34 KB  | Same common-operation comparison |
 | date-fns (full)         | 261.3 KB  | Full package                     |
 
-date-light ships 39 functions in 2.19 KB minzipped; the 8.4x figure compares it against importing 20 comparable date-fns functions. It is also 1.4x smaller than dayjs core.
+date-light ships 39 functions in 2.18 KB minzipped; the 8.4x figure compares it against importing 20 comparable date-fns functions. It is also 1.4x smaller than dayjs core.
 
 ## Run Locally
 
