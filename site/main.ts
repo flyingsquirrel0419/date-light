@@ -641,45 +641,65 @@ function bindSearch() {
     return;
   }
 
+  const searchInput = input;
+  const searchResults = results;
+
   function renderResults(query: string) {
     const normalized = query.trim().toLowerCase();
     const matches = normalized
       ? docsSearchItems.filter((item) => item.terms.includes(normalized)).slice(0, 7)
       : docsSearchItems.slice(0, 5);
 
-    results.hidden = false;
-    results.innerHTML = matches.length
-      ? matches
-          .map(
-            (item) => `
-              <button type="button" data-doc-result="${item.id}">
-                <span>${item.label}</span>
-                <small>${item.group}</small>
-              </button>
-            `,
-          )
-          .join("")
-      : `<div class="empty-search">No docs match "${query}"</div>`;
+    searchResults.hidden = false;
+    searchResults.replaceChildren();
 
-    results.querySelectorAll<HTMLButtonElement>("[data-doc-result]").forEach((button) => {
+    if (matches.length) {
+      matches.forEach((item) => {
+        const button = document.createElement("button");
+        const label = document.createElement("span");
+        const group = document.createElement("small");
+
+        button.type = "button";
+        button.dataset.docResult = item.id;
+        label.textContent = item.label;
+        group.textContent = item.group;
+        button.append(label, group);
+        searchResults.append(button);
+      });
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "empty-search";
+      empty.textContent = `No docs match "${query}"`;
+      searchResults.append(empty);
+    }
+
+    searchResults.querySelectorAll<HTMLButtonElement>("[data-doc-result]").forEach((button) => {
       button.addEventListener("click", () => {
         const id = button.dataset.docResult!;
-        input.value = "";
-        results.hidden = true;
+        searchInput.value = "";
+        searchResults.hidden = true;
         navigate(`${appPath("/docs")}#${id}`);
       });
     });
   }
 
-  input.addEventListener("focus", () => renderResults(input.value));
-  input.addEventListener("input", () => renderResults(input.value));
-  input.addEventListener("keydown", (event) => {
+  searchInput.addEventListener("focus", () => renderResults(searchInput.value));
+  searchInput.addEventListener("input", () => renderResults(searchInput.value));
+  searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-      results.hidden = true;
-      input.blur();
+      searchResults.hidden = true;
+      searchInput.blur();
     }
   });
+}
 
+function getHashTargetId(hash: string): string {
+  const rawId = hash.startsWith("#") ? hash.slice(1) : hash;
+  try {
+    return decodeURIComponent(rawId);
+  } catch {
+    return rawId;
+  }
 }
 
 function scrollToHash() {
@@ -687,7 +707,9 @@ function scrollToHash() {
     return;
   }
   window.requestAnimationFrame(() => {
-    document.querySelector(window.location.hash)?.scrollIntoView({ block: "start" });
+    document
+      .getElementById(getHashTargetId(window.location.hash))
+      ?.scrollIntoView({ block: "start" });
   });
 }
 
@@ -747,15 +769,23 @@ function preparePlaygroundCode(code: string): PreparedPlaygroundCode {
   const importPattern =
     /import\s+(?:(\{[\s\S]*?\})|([A-Za-z_$][\w$]*)|\*\s+as\s+([A-Za-z_$][\w$]*))\s+from\s+["']([^"']+)["'];?/g;
 
-  let executableCode = code.replace(
+  const executableCode = code.replace(
     importPattern,
-    (_match, namedImport: string | undefined, defaultImport: string | undefined, namespaceImport: string | undefined, source: string) => {
+    (
+      _match,
+      namedImport: string | undefined,
+      defaultImport: string | undefined,
+      namespaceImport: string | undefined,
+      source: string,
+    ) => {
       if (source !== "date-light") {
         throw new TypeError(`Only imports from "date-light" can run in the playground.`);
       }
 
       if (defaultImport || namespaceImport || !namedImport) {
-        throw new SyntaxError(`Use named imports from "date-light", for example: import { format } from "date-light";`);
+        throw new SyntaxError(
+          `Use named imports from "date-light", for example: import { format } from "date-light";`,
+        );
       }
 
       parseImportSpecifiers(namedImport.slice(1, -1)).forEach(([exportName, localName]) => {
@@ -792,7 +822,7 @@ function preparePlaygroundCode(code: string): PreparedPlaygroundCode {
     }
   }
   if (lastIndex === -1) {
-    return withoutImports;
+    return { code: withoutImports, names, values };
   }
 
   const lastLine = lines[lastIndex].trim().replace(/;$/, "");
@@ -848,13 +878,16 @@ function runPlaygroundCode(code: string): string[] {
     return ["No code to run."];
   }
 
-  new Function(...preparedCode.names, "console", "__capture", `"use strict";\n${preparedCode.code}`)(
-    ...preparedCode.values,
-    consoleProxy,
-    capture,
-  );
+  new Function(
+    ...preparedCode.names,
+    "console",
+    "__capture",
+    `"use strict";\n${preparedCode.code}`,
+  )(...preparedCode.values, consoleProxy, capture);
 
-  return logs.length ? logs : ["No output. Add console.log(...) or leave an expression on the last line."];
+  return logs.length
+    ? logs
+    : ["No output. Add console.log(...) or leave an expression on the last line."];
 }
 
 function formatPlaygroundError(error: unknown): string {
@@ -868,7 +901,8 @@ function formatPlaygroundError(error: unknown): string {
 function bindPlayground() {
   bindLiquidTabs();
   let active =
-    presets.find((preset) => document.querySelector(`[data-preset="${preset.id}"].active`)) ?? presets[0];
+    presets.find((preset) => document.querySelector(`[data-preset="${preset.id}"].active`)) ??
+    presets[0];
   const status = document.querySelector<HTMLElement>("[data-status]")!;
   const output = document.querySelector<HTMLElement>("[data-output]")!;
   const outputConsole = document.querySelector<HTMLElement>("[data-output-console]")!;
@@ -898,7 +932,9 @@ function bindPlayground() {
     try {
       status.textContent = "success";
       status.dataset.state = "success";
-      output.textContent = runPlaygroundCode(editor.value).map((line) => `> ${line}`).join("\n");
+      output.textContent = runPlaygroundCode(editor.value)
+        .map((line) => `> ${line}`)
+        .join("\n");
       outputConsole.dataset.state = "success";
     } catch (error) {
       status.textContent = "error";
