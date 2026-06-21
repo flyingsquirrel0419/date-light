@@ -119,6 +119,13 @@ describe("parse — various patterns", () => {
     expect(d.getSeconds()).toBe(45);
   });
 
+  it("parses with hour and minute components", () => {
+    const d = parse("2026-01-15 14:30", "yyyy-MM-dd HH:mm");
+    expect(d.getHours()).toBe(14);
+    expect(d.getMinutes()).toBe(30);
+    expect(d.getSeconds()).toBe(0);
+  });
+
   it("parses with milliseconds", () => {
     const d = parse("2026-01-15 14:30:45.123", "yyyy-MM-dd HH:mm:ss.SSS");
     expect(d.getMilliseconds()).toBe(123);
@@ -136,6 +143,18 @@ describe("parse — various patterns", () => {
     expect(d.getFullYear()).toBe(2026);
     expect(d.getMonth()).toBe(0);
     expect(d.getDate()).toBe(15);
+  });
+
+  it("parses non-fast patterns with all time tokens", () => {
+    const pattern = "yyyy.MM.dd HH_mm_ss_SSS";
+    const first = parse("2026.01.15 14_30_45_123", pattern);
+    const second = parse("2026.01.15 14_30_45_123", pattern);
+
+    expect(first.getHours()).toBe(14);
+    expect(first.getMinutes()).toBe(30);
+    expect(first.getSeconds()).toBe(45);
+    expect(first.getMilliseconds()).toBe(123);
+    expect(second.getTime()).toBe(first.getTime());
   });
 });
 
@@ -167,7 +186,6 @@ describe("parse — error cases", () => {
   it("throws RangeError on trailing input", () => {
     expect(() => parse("2026-01-15 extra", "yyyy-MM-dd")).toThrow(RangeError);
   });
-
 });
 
 describe("parse — round-trip with format", () => {
@@ -249,6 +267,15 @@ describe("format — all tokens", () => {
 
   it("formats SSS for milliseconds", () => {
     expect(format(new Date(2026, 0, 15, 0, 0, 0, 5), "SSS")).toBe("005");
+  });
+
+  it("formats common fast-path date/time patterns", () => {
+    const d = new Date(2026, 0, 5, 9, 5, 3, 7);
+
+    expect(format(d, "yyyy-MM-dd")).toBe("2026-01-05");
+    expect(format(d, "yyyy-MM-dd HH:mm")).toBe("2026-01-05 09:05");
+    expect(format(d, "yyyy-MM-dd HH:mm:ss")).toBe("2026-01-05 09:05:03");
+    expect(format(d, "yyyy-MM-dd HH:mm:ss.SSS")).toBe("2026-01-05 09:05:03.007");
   });
 
   it("formats each day of the week", () => {
