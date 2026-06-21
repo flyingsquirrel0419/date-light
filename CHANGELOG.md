@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-06-21
+
+### Changed
+
+- Optimized common `format()` patterns with dedicated fast paths.
+- Optimized `parse()` by compiling and caching reusable pattern metadata.
+- Reworked date-only `parseISO()` prefix parsing to avoid repeated regex and split work.
+- Updated documented minzipped size to 3.11 KB after the performance tradeoff.
+
+### Added
+
+- Regression coverage for cached non-fast-path parse patterns and common date/time format fast paths.
+
 ## [0.1.3] - 2026-06-11
 
 ### Fixed
@@ -77,6 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vitest benchmarks vs date-fns and dayjs
 - Zero runtime dependencies
 
+[0.1.4]: https://github.com/flyingsquirrel0419/date-light/releases/tag/v0.1.4
 [0.1.3]: https://github.com/flyingsquirrel0419/date-light/releases/tag/v0.1.3
 [0.1.2]: https://github.com/flyingsquirrel0419/date-light/releases/tag/v0.1.2
 [0.1.1]: https://github.com/flyingsquirrel0419/date-light/releases/tag/v0.1.1
